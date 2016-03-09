@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center_horizontal"
-                android:text="Team A"
+                android:text="Team B"
                 android:textAlignment="center"
                 android:textColor="@color/teamName"
                 android:textSize="@dimen/teamName" />
