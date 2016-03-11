@@ -23,16 +23,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/inner_separation"
-        android:labelFor="@id/reminder_description"
+        android:labelFor="@+id/reminder_description"
         android:text="@string/reminder_description" />
 
     <EditText
-        android:id="@+id/reminder_description"
+        android:id="@id/reminder_description"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/inner_separation"
         android:layout_weight="1"
         android:inputType="text|textMultiLine"
+        android:gravity="top"
         android:scrollbars="vertical" />
 
 
@@ -41,16 +42,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/inner_separation"
-        android:labelFor="@id/location"
+        android:labelFor="@+id/location"
         android:text="@string/reminder_location" />
 
     <EditText
-        android:id="@+id/location"
+        android:id="@id/location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/inner_separation"
         android:drawableRight="@drawable/ic_chevron_right_black_24dp"
+        android:text="tssdfsdfsdfsdfsdfsdfsdfsdfsdfsdsfdsfdsfdt"
         android:inputType="none"
+        android:editable="false"
+        android:singleLine="true"
         android:lines="1" />
 
     <Button
