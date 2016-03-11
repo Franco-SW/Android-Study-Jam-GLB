@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_margin"
+    tools:context="com.globant.rossi.franco.locationreminder.DetailCreate">
+
+    <EditText
+        android:id="@+id/reminder_title"
+        style="@style/detailCreate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/inner_separation"
+        android:hint="@string/reminder_title"
+        android:inputType="text"
+        android:lines="1" />
+
+
+    <TextView
+        style="@style/detailCreateTitles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/inner_separation"
+        android:labelFor="@id/reminder_description"
+        android:text="@string/reminder_description" />
+
+    <EditText
+        android:id="@+id/reminder_description"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/inner_separation"
+        android:layout_weight="1"
+        android:inputType="text|textMultiLine"
+        android:scrollbars="vertical" />
+
+
+    <TextView
+        style="@style/detailCreateTitles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/inner_separation"
+        android:labelFor="@id/location"
+        android:text="@string/reminder_location" />
+
+    <EditText
+        android:id="@+id/location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/inner_separation"
+        android:drawableRight="@drawable/ic_chevron_right_black_24dp"
+        android:inputType="none"
+        android:lines="1" />
+
+    <Button
+        android:id="@+id/save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/inner_separation"
+        android:text="@string/reminder_save"
+        android:textAllCaps="true" />
+
+
+</LinearLayout>

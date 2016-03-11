@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Location Reminder</string>
+    <string name="title">Reminders</string>
+    <string name="reminder_title">TITLE</string>
+    <string name="reminder_description">Description</string>
+    <string name="reminder_location">Location</string>
+    <string name="reminder_save">Save</string>
 </resources>
