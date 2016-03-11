@@ -32,8 +32,8 @@
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/inner_separation"
         android:layout_weight="1"
-        android:inputType="text|textMultiLine"
         android:gravity="top"
+        android:inputType="text|textMultiLine"
         android:scrollbars="vertical" />
 
 
@@ -51,11 +51,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/inner_separation"
         android:drawableRight="@drawable/ic_chevron_right_black_24dp"
-        android:text="tssdfsdfsdfsdfsdfsdfsdfsdfsdfsdsfdsfdsfdt"
-        android:inputType="none"
         android:editable="false"
+        android:inputType="none"
+        android:lines="1"
         android:singleLine="true"
-        android:lines="1" />
+        android:text="@string/defaultLocation" />
 
     <Button
         android:id="@+id/save"
