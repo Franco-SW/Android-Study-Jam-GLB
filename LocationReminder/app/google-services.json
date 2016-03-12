@@ -1,0 +1,43 @@
+{
+  "project_info": {
+    "project_id": "deep-lore-124703",
+    "project_number": "508995952277",
+    "name": "My Project"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:508995952277:android:23af26537e26918a",
+        "client_id": "android:com.globant.rossi.franco.locationreminder",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.globant.rossi.franco.locationreminder",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

@@ -55,16 +55,36 @@
         android:inputType="none"
         android:lines="1"
         android:singleLine="true"
-        android:text="@string/defaultLocation" />
+        android:hint="@string/location_hint" />
 
-    <Button
-        android:id="@+id/save"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="@dimen/inner_separation"
-        android:text="@string/reminder_save"
-        android:textAllCaps="true" />
+        android:layout_marginTop="@dimen/inner_separation">
+
+        <Button
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/button_min_size"
+            android:minWidth="@dimen/button_min_size"
+            android:layout_alignParentLeft="true"
+            android:text="@string/reminder_delete"
+            style="@style/deleteButton" />
+
+        <Button
+
+            android:id="@+id/save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerHorizontal="true"
+            android:minHeight="@dimen/button_min_size"
+            android:text="@string/reminder_save" />
+
+
+    </RelativeLayout>
+
 
 
 </LinearLayout>

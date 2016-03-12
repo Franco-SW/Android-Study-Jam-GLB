@@ -5,5 +5,9 @@
     <string name="reminder_description">Description</string>
     <string name="reminder_location">Location</string>
     <string name="reminder_save">Save</string>
-    <string name="defaultLocation">tssdfsdfsdfsdfsdfsdfsdfsdfsdfsdsfdsfdsfdt</string>
+    <string name="reminder_delete">Delete</string>
+    <string name="location_hint">Select a Location</string>
+    <string name="noPermisionLocationError" >NO PERMISSION TO USE LOCATION</string>
+    <string name="notEnabledLocationTitle" >LOCATION SETTINGS</string>
+    <string name="notEnabledLocationMessage" >Location is not enabled. Do you want to go to the settings menu?</string>
 </resources>
