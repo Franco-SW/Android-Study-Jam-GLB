@@ -77,6 +77,27 @@ public class DetailCreate extends AppCompatActivity {
                 //getLocation(v);
             }
         });
+
+        Button saveButton = (Button) findViewById(R.id.save);
+        saveButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v)
+            {
+                getIntent().putExtra("IS_SAVE", true);
+                reminder.setRemainderAsExtra(getIntent());
+                finish();
+            }
+        });
+
+        Button deleteButton = (Button) findViewById(R.id.delete);
+        deleteButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v)
+            {
+                getIntent().putExtra("IS_SAVE", false);
+                finish();
+            }
+        });
         //TODO: Add Save/Delete Buttons listeners
 //        save.setOnClickListener(new View.OnClickListener() {
 //            @Override

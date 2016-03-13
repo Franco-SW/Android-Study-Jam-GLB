@@ -2,9 +2,11 @@ package com.globant.rossi.franco.locationreminder;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -16,12 +18,24 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
     private LocationTracker locationTracker;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 0;
+    private static final int DETAIL_CREATION = 2;
+    private String SAVED_REMINDERS = "SAVED_REMINDERS";
+    private List<Reminder> mReminders;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +62,38 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         //TODO: Add logic to get the saved Reminders.
         //TODO: Add Logic to order Reminders by uID (default ordering when can't get position)
-
+        LoadSavedLocations();
         getLocation();
+
+        //TODO: Remove this when done. Only for TSTNG
+        Reminder rem = new Reminder();
+        rem.uID = 0;
+        rem.title = "Nalguinator Title";
+        rem.description = "Go buy some nalginator's stuff";
+        rem.lat=-32.9674028;
+        rem.lng=-60.6468832;
+        rem.placeName = "Nalguinator's Store";
+        rem.placeAddress = "False AV. 777";
+        mReminders.add(rem);
+
+        UpdateRemindersList();
+    }
+
+    private void LoadSavedLocations()
+    {
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        String savedReminders = sharedPref.getString(SAVED_REMINDERS, "");
+
+        if(savedReminders != "")
+        {
+            Gson gson = new Gson();
+            Type collectionType = new TypeToken<List<Reminder>>(){}.getType();
+            mReminders = gson.fromJson(savedReminders, collectionType);
+        }
+        else
+        {
+            mReminders = new ArrayList<Reminder>();
+        }
     }
 
     public void addReminder(View v) {
@@ -65,9 +109,79 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         rem.placeName = "El rincon de la murga";
         rem.placeAddress = "Tst Address";
         rem.setRemainderAsExtra(intent);
+
         //Up to here
 
-        startActivity(intent);
+        startActivityForResult(intent, DETAIL_CREATION);
+    }
+
+    //Callback executed when the Place Picker is closed
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == DETAIL_CREATION && resultCode == Activity.RESULT_OK) {
+            Reminder reminder = Reminder.getRemainderFromExtra(data);
+            if(data.getBooleanExtra("IS_SAVE", true))
+            {
+                AddReminder(reminder);
+            }
+            else
+            {
+                DeleteReminder(reminder);
+            }
+
+            SaveReminers();
+            UpdateRemindersList();
+        }
+    }
+
+    public void AddReminder(Reminder reminder)
+    {
+        int indexToRemove = -1;
+        for(Reminder item : mReminders)
+        {
+            if(item.uID == reminder.uID)
+            {
+                indexToRemove = mReminders.indexOf(item);
+            }
+        }
+
+        if(indexToRemove > -1)
+        {
+            mReminders.remove(indexToRemove);
+        }
+
+        mReminders.add(reminder);
+    }
+
+    public void DeleteReminder(Reminder reminder)
+    {
+        for(Reminder item : mReminders)
+        {
+            if(item.uID == reminder.uID)
+            {
+                mReminders.remove(mReminders.indexOf(item));
+                break;
+            }
+        }
+    }
+
+    public void SaveReminers()
+    {
+        Gson gson = new Gson();
+        String jsonReminders = gson.toJson(mReminders);
+
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(SAVED_REMINDERS, jsonReminders);
+        editor.commit();
+    }
+
+    public void UpdateRemindersList()
+    {
+        ReminderListAdapter adapter = new ReminderListAdapter(this, mReminders, getLayoutInflater());
+        ListView listView = (ListView) findViewById(R.id.remainder_list);
+        listView.setAdapter(adapter);
     }
 
     public void getLocation() {
