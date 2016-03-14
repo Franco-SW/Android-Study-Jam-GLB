@@ -38,6 +38,8 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
         TextView titleTextView = (TextView)itemView.findViewById(R.id.list_item_title);
         titleTextView.setText(reminder.title);
 
+
+
         return itemView;
     }
 }

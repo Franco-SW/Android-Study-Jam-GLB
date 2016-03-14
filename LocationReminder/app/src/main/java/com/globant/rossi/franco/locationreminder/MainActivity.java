@@ -18,6 +18,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -100,11 +101,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         startActivityForResult(intent, DETAIL_CREATION);
     }
 
+    public void editReminder(Reminder rem) {
+        Intent intent = new Intent(this, DetailCreate.class);
+        rem.setRemainderAsExtra(intent);
+
+        startActivityForResult(intent, DETAIL_CREATION);
+    }
+
     //Callback executed when the Place Picker is closed
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == DETAIL_CREATION) {
+        if (requestCode == DETAIL_CREATION && resultCode == RESULT_OK) {
             Reminder reminder = Reminder.getRemainderFromExtra(data);
             if(data.getBooleanExtra("IS_SAVE", true))
             {
@@ -167,6 +175,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         ReminderListAdapter adapter = new ReminderListAdapter(this, mReminders, getLayoutInflater());
         ListView listView = (ListView) findViewById(R.id.remainder_list);
         listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+
+                editReminder(mReminders.get(position));
+            }
+        });
     }
 
     public void getLocation() {
