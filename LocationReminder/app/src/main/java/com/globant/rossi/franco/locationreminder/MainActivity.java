@@ -2,7 +2,6 @@ package com.globant.rossi.franco.locationreminder;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,7 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -62,13 +60,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
-        LoadSavedLocations();
+        loadSavedLocations();
         getLocation();
-        UpdateRemindersList();
+        updateRemindersList();
         //TODO: Add Logic to order Reminders by uID (default ordering when can't get position)
     }
 
-    private void LoadSavedLocations()
+    private void loadSavedLocations()
     {
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         String savedReminders = sharedPref.getString(SAVED_REMINDERS, "");
@@ -116,19 +114,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Reminder reminder = Reminder.getRemainderFromExtra(data);
             if(data.getBooleanExtra("IS_SAVE", true))
             {
-                AddReminder(reminder);
+                addReminder(reminder);
             }
             else
             {
-                DeleteReminder(reminder);
+                deleteReminder(reminder);
             }
 
-            SaveReminers();
-            UpdateRemindersList();
+            saveReminders();
+            updateRemindersList();
         }
     }
 
-    public void AddReminder(Reminder reminder)
+    public void addReminder(Reminder reminder)
     {
         int indexToRemove = -1;
         for(Reminder item : mReminders)
@@ -147,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mReminders.add(reminder);
     }
 
-    public void DeleteReminder(Reminder reminder)
+    public void deleteReminder(Reminder reminder)
     {
         for(Reminder item : mReminders)
         {
@@ -159,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    public void SaveReminers()
+    public void saveReminders()
     {
         Gson gson = new Gson();
         String jsonReminders = gson.toJson(mReminders);
@@ -170,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         editor.commit();
     }
 
-    public void UpdateRemindersList()
+    public void updateRemindersList()
     {
         ReminderListAdapter adapter = new ReminderListAdapter(this, mReminders, getLayoutInflater());
         ListView listView = (ListView) findViewById(R.id.remainder_list);
