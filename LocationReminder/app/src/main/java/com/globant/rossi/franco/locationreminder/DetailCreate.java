@@ -15,12 +15,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -83,8 +86,10 @@ public class DetailCreate extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
+                updateReminder();
                 getIntent().putExtra("IS_SAVE", true);
                 reminder.setRemainderAsExtra(getIntent());
+                setResult(RESULT_OK, getIntent());
                 finish();
             }
         });
@@ -94,18 +99,25 @@ public class DetailCreate extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
+                updateReminder();
                 getIntent().putExtra("IS_SAVE", false);
+                reminder.setRemainderAsExtra(getIntent());
+                setResult(RESULT_OK, getIntent());
                 finish();
             }
         });
-        //TODO: Add Save/Delete Buttons listeners
-//        save.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//            }
-//        });
     }
 
+    private void updateReminder()
+    {
+        EditText titleEditText = (EditText) findViewById(R.id.reminder_title);
+        reminder.title = titleEditText.getText().toString();
+
+        EditText descriptionEditText = (EditText) findViewById(R.id.reminder_description);
+        reminder.description = descriptionEditText.getText().toString();
+
+        //TODO UPDATE LOCATION ON REMINDER?
+    }
 
     //Functions for Event Listeners
     private void locationFocused(View v, boolean hasFocus) {

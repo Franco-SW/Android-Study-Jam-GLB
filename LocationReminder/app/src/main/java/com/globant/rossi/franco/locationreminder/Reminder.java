@@ -15,12 +15,12 @@ public class Reminder {
 
     public void Reminder() {
         uID = NO_UID;
-        title = null;
-        description = null;
+        title = "";
+        description = "";
         lat = 0;
         lng = 0;
-        placeName = null;
-        placeAddress = null;
+        placeName = "";
+        placeAddress = "";
     }
 
     public boolean isValid() {

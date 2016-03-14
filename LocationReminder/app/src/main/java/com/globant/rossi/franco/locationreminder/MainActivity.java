@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private LocationTracker locationTracker;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 0;
     private static final int DETAIL_CREATION = 2;
-    private String SAVED_REMINDERS = "SAVED_REMINDERS";
+    private static final String SAVED_REMINDERS = "SAVED_REMINDERS";
+    private static final String CURRENT_REMINDER_ID = "CURRENT_REMINDER_ID";
     private List<Reminder> mReminders;
 
     @Override
@@ -60,23 +61,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
-        //TODO: Add logic to get the saved Reminders.
-        //TODO: Add Logic to order Reminders by uID (default ordering when can't get position)
         LoadSavedLocations();
         getLocation();
-
-        //TODO: Remove this when done. Only for TSTNG
-        Reminder rem = new Reminder();
-        rem.uID = 0;
-        rem.title = "Nalguinator Title";
-        rem.description = "Go buy some nalginator's stuff";
-        rem.lat=-32.9674028;
-        rem.lng=-60.6468832;
-        rem.placeName = "Nalguinator's Store";
-        rem.placeAddress = "False AV. 777";
-        mReminders.add(rem);
-
         UpdateRemindersList();
+        //TODO: Add Logic to order Reminders by uID (default ordering when can't get position)
     }
 
     private void LoadSavedLocations()
@@ -97,20 +85,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     public void addReminder(View v) {
-        Intent intent = new Intent(this, DetailCreate.class);
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        int currentReminderId = sharedPref.getInt(CURRENT_REMINDER_ID, 0);
 
-        //TODO: Remove this when done. Only for TSTNG
+        Intent intent = new Intent(this, DetailCreate.class);
         Reminder rem = new Reminder();
-        rem.uID = 0;
-        rem.title = "Tst Title";
-        rem.description = "Description & Dirt";
-        rem.lat=-32.9674028;
-        rem.lng=-60.6468832;
-        rem.placeName = "El rincon de la murga";
-        rem.placeAddress = "Tst Address";
+        rem.uID = currentReminderId;
         rem.setRemainderAsExtra(intent);
 
-        //Up to here
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(CURRENT_REMINDER_ID, currentReminderId + 1);
+        editor.commit();
 
         startActivityForResult(intent, DETAIL_CREATION);
     }
@@ -119,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == DETAIL_CREATION && resultCode == Activity.RESULT_OK) {
+        if (requestCode == DETAIL_CREATION) {
             Reminder reminder = Reminder.getRemainderFromExtra(data);
             if(data.getBooleanExtra("IS_SAVE", true))
             {
