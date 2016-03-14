@@ -36,6 +36,15 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
         TextView titleTextView = (TextView)itemView.findViewById(R.id.list_item_title);
         titleTextView.setText(reminder.title);
 
+        Button deleteButton = (Button)itemView.findViewById(R.id.list_item_delete_button);
+        deleteButton.setTag(reminder.uID);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainActivity.deleteReminder((int) v.getTag());
+            }
+        });
+
         return itemView;
     }
 }

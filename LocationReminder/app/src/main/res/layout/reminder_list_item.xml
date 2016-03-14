@@ -8,10 +8,22 @@
 
     <TextView
         android:id="@+id/list_item_title"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:layout_gravity="center_vertical"
         android:textSize="16sp"
         android:text="SomeText" />
+
+    <Button
+        android:id="@+id/list_item_delete_button"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="@android:color/holo_red_light"
+        android:textColor="@android:color/white"
+        android:text="DELETE"/>
 
 </LinearLayout>

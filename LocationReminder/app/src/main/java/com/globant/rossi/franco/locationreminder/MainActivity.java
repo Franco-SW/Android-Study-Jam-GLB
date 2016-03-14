@@ -34,9 +34,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private static final String CURRENT_REMINDER_ID = "CURRENT_REMINDER_ID";
     private static final String SAVED_REMINDERS = "SAVED_REMINDERS";
 
-    private ArrayList<Reminder> mRemindersList;
     private Location lastLocation;
     private LocationTracker locationTracker;
+    private List<Reminder> mRemindersList;
     private GestureDetectorCompat mDetector;
 
     @Override
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
         if (savedReminders != "") {
             Gson gson = new Gson();
-            Type collectionType = new TypeToken<ArrayList<Reminder>>() {
+            Type collectionType = new TypeToken<List<Reminder>>() {
             }.getType();
             mRemindersList = gson.fromJson(savedReminders, collectionType);
         } else {
@@ -145,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             } else {
                 deleteReminder(reminder);
             }
-            saveRemindersList();
         }
     }
 
@@ -165,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             mRemindersList.add(reminder);
         }
         sortRemainderList();
+        saveRemindersList();
         updateRemindersListView();
     }
 
@@ -174,8 +174,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             mRemindersList.remove(reminderIndex);
             updateRemindersListView();
         }
+        saveRemindersList();
+        updateRemindersListView();
     }
-
 
     private void sortRemainderList(){
         Comparator<Reminder> comparator = new Comparator<Reminder>(){
