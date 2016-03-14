@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             } else {
                 deleteReminder(reminder.uID);
             }
-            saveRemindersList();
         }
     }
 
@@ -163,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             editor.commit();
             mRemindersList.add(reminder);
         }
+        saveRemindersList();
         updateRemindersListView();
     }
 
