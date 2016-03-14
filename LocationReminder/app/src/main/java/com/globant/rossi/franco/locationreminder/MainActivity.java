@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             if (data.getBooleanExtra(DetailCreate.IS_SAVE, true)) {
                 addOrUpdateReminder(reminder);
             } else {
-                deleteReminder(reminder);
+                deleteReminder(reminder.uID);
             }
             saveRemindersList();
         }
@@ -166,9 +166,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         updateRemindersListView();
     }
 
-    public void deleteReminder(Reminder reminder) {
+    public void deleteReminder(int uID) {
         for (Reminder item : mRemindersList) {
-            if (item.uID == reminder.uID) {
+            if (item.uID == uID) {
                 mRemindersList.remove(mRemindersList.indexOf(item));
                 break;
             }
