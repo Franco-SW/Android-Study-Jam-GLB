@@ -24,16 +24,19 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LocationListener{
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 0;
     private static final int DETAIL_CREATION_REQUEST_CODE = 2;
-    private static final String SAVED_REMINDERS = "SAVED_REMINDERS";
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 0;
     private static final String CURRENT_REMINDER_ID = "CURRENT_REMINDER_ID";
+    private static final String SAVED_REMINDERS = "SAVED_REMINDERS";
 
+    private ArrayList<Reminder> mRemindersList;
+    private Location lastLocation;
     private LocationTracker locationTracker;
-    private List<Reminder> mRemindersList;
     private GestureDetectorCompat mDetector;
 
     @Override
@@ -70,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
         if (savedReminders != "") {
             Gson gson = new Gson();
-            Type collectionType = new TypeToken<List<Reminder>>() {
+            Type collectionType = new TypeToken<ArrayList<Reminder>>() {
             }.getType();
             mRemindersList = gson.fromJson(savedReminders, collectionType);
         } else {
@@ -147,12 +150,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     }
 
     private void addOrUpdateReminder(Reminder reminder) {
-        if (reminder.uID > -1) {
-            for (Reminder item : mRemindersList) {
-                if (item.uID == reminder.uID) {
-                    mRemindersList.set(mRemindersList.indexOf(item), reminder);
-                    break;
-                }
+        if (reminder.isValid()) {
+            int reminderIndex = mRemindersList.indexOf(reminder);
+            if(reminderIndex >= 0){
+                mRemindersList.set(reminderIndex, reminder);
             }
         } else {
             SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
@@ -163,17 +164,36 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             editor.commit();
             mRemindersList.add(reminder);
         }
+        sortRemainderList();
         updateRemindersListView();
     }
 
     public void deleteReminder(Reminder reminder) {
-        for (Reminder item : mRemindersList) {
-            if (item.uID == reminder.uID) {
-                mRemindersList.remove(mRemindersList.indexOf(item));
-                break;
-            }
+        int reminderIndex = mRemindersList.indexOf(reminder);
+        if(reminderIndex >= 0){
+            mRemindersList.remove(reminderIndex);
+            updateRemindersListView();
         }
-        updateRemindersListView();
+    }
+
+
+    private void sortRemainderList(){
+        Comparator<Reminder> comparator = new Comparator<Reminder>(){
+            @Override
+            public int compare(Reminder r1, Reminder r2) {
+                double result = r1.distanceToLocationSquared(lastLocation) - r2.distanceToLocationSquared(lastLocation);
+
+                if(result > 0){
+                    return 1;
+                }else if(result < 0){
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        };
+
+        Collections.sort(mRemindersList, comparator);
     }
 
     private void saveRemindersList() {
@@ -197,8 +217,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     @Override
     public void onLocationChanged(Location location) {
         //TODO: Remove Toast when done
-        Toast.makeText(this, "Location: " + location.toString(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Location: " + location.toString(), Toast.LENGTH_SHORT).show();
         //TODO: Add Ordering Logic of the Reminders here (by distance to current location)
+        lastLocation = location;
+        sortRemainderList();
         updateRemindersListView();
         saveRemindersList();
     }

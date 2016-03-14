@@ -1,6 +1,7 @@
 package com.globant.rossi.franco.locationreminder;
 
 import android.content.Intent;
+import android.location.Location;
 
 public class Reminder {
     public static final int NO_UID = -1;
@@ -13,7 +14,7 @@ public class Reminder {
     public String placeName;
     public String placeAddress;
 
-    public void Reminder() {
+    public Reminder() {
         uID = NO_UID;
         title = "";
         description = "";
@@ -21,6 +22,13 @@ public class Reminder {
         lng = 0;
         placeName = "";
         placeAddress = "";
+    }
+
+
+    @Override
+    public boolean equals(Object o){
+            return super.equals(o) ||
+                    (o instanceof Reminder && (((Reminder) o).uID == this.uID));
     }
 
     public boolean isValid() {
@@ -59,6 +67,11 @@ public class Reminder {
         this.placeAddress = placeAddress;
         this.lat = lat;
         this.lng = lng;
+    }
+
+    public double distanceToLocationSquared(Location location){
+        return Math.pow(location.getLatitude() - lat, 2) +
+                Math.pow(location.getLongitude() - lng, 2);
     }
 
     public void setRemainderAsExtra(Intent intent) {
