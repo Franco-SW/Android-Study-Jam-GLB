@@ -173,6 +173,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 break;
             }
         }
+
+        saveRemindersList();
         updateRemindersListView();
     }
 
