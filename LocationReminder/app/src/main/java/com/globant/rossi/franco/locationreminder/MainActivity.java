@@ -3,17 +3,14 @@ package com.globant.rossi.franco.locationreminder;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
-import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -29,13 +26,15 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
-    private LocationTracker locationTracker;
+public class MainActivity extends AppCompatActivity implements LocationListener{
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 0;
-    private static final int DETAIL_CREATION = 2;
+    private static final int DETAIL_CREATION_REQUEST_CODE = 2;
     private static final String SAVED_REMINDERS = "SAVED_REMINDERS";
     private static final String CURRENT_REMINDER_ID = "CURRENT_REMINDER_ID";
-    private List<Reminder> mReminders;
+
+    private LocationTracker locationTracker;
+    private List<Reminder> mRemindersList;
+    private GestureDetectorCompat mDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +42,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         setContentView(R.layout.activity_main);
         locationTracker = new LocationTracker(this, this);
 
+        loadRemindersList();
+        getLocation();
+        updateRemindersListView();
+
         //Event Listeners
         FloatingActionButton addReminderFAB = (FloatingActionButton) findViewById(R.id.add_fab);
         addReminderFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addReminder(v);
+                createReminder();
             }
         });
         ImageButton getLocationButton = (ImageButton) findViewById(R.id.get_location);
@@ -59,123 +62,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 getLocation();
             }
         });
-
-        loadSavedLocations();
-        getLocation();
-        updateRemindersList();
-        //TODO: Add Logic to order Reminders by uID (default ordering when can't get position)
     }
 
-    private void loadSavedLocations()
-    {
+    private void loadRemindersList() {
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         String savedReminders = sharedPref.getString(SAVED_REMINDERS, "");
 
-        if(savedReminders != "")
-        {
+        if (savedReminders != "") {
             Gson gson = new Gson();
-            Type collectionType = new TypeToken<List<Reminder>>(){}.getType();
-            mReminders = gson.fromJson(savedReminders, collectionType);
-        }
-        else
-        {
-            mReminders = new ArrayList<Reminder>();
-        }
-    }
-
-    public void addReminder(View v) {
-        Intent intent = new Intent(this, DetailCreate.class);
-        startActivityForResult(intent, DETAIL_CREATION);
-    }
-
-    public void editReminder(Reminder rem) {
-        Intent intent = new Intent(this, DetailCreate.class);
-        rem.setRemainderAsExtra(intent);
-
-        startActivityForResult(intent, DETAIL_CREATION);
-    }
-
-    //Callback executed when the Place Picker is closed
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == DETAIL_CREATION && resultCode == RESULT_OK) {
-            Reminder reminder = Reminder.getRemainderFromExtra(data);
-            if(data.getBooleanExtra("IS_SAVE", true))
-            {
-                addOrEditReminder(reminder);
-            }
-            else
-            {
-                deleteReminder(reminder);
-            }
-
-            saveReminders();
-            updateRemindersList();
+            Type collectionType = new TypeToken<List<Reminder>>() {
+            }.getType();
+            mRemindersList = gson.fromJson(savedReminders, collectionType);
+        } else {
+            mRemindersList = new ArrayList<Reminder>();
         }
     }
 
-    public void addOrEditReminder(Reminder reminder)
-    {
-        if(reminder.uID > -1) {
-            for (Reminder item : mReminders) {
-                if (item.uID == reminder.uID) {
-                    mReminders.set(mReminders.indexOf(item), reminder);
-                    break;
-                }
-            }
-        }
-        else
-        {
-            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-            int currentReminderId = sharedPref.getInt(CURRENT_REMINDER_ID, 0);
-            reminder.uID = currentReminderId;
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt(CURRENT_REMINDER_ID, currentReminderId + 1);
-            editor.commit();
-            mReminders.add(reminder);
-        }
-    }
-
-    public void deleteReminder(Reminder reminder)
-    {
-        for(Reminder item : mReminders)
-        {
-            if(item.uID == reminder.uID)
-            {
-                mReminders.remove(mReminders.indexOf(item));
-                break;
-            }
-        }
-    }
-
-    public void saveReminders()
-    {
-        Gson gson = new Gson();
-        String jsonReminders = gson.toJson(mReminders);
-
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(SAVED_REMINDERS, jsonReminders);
-        editor.commit();
-    }
-
-    public void updateRemindersList()
-    {
-        ReminderListAdapter adapter = new ReminderListAdapter(this, mReminders, getLayoutInflater());
-        ListView listView = (ListView) findViewById(R.id.remainder_list);
-        listView.setAdapter(adapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-
-                editReminder(mReminders.get(position));
-            }
-        });
-    }
-
-    public void getLocation() {
+    private void getLocation() {
         try {
             locationTracker.requestLocation();
         } catch (SecurityException sE) {
@@ -186,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-
     @TargetApi(23)
     private void hasPermission(boolean accessToFineLocation) {
         if (!accessToFineLocation) {
@@ -195,10 +97,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (permissions.length > 0) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -206,6 +106,84 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
             }
         }
+    }
+
+    private void updateRemindersListView() {
+        ReminderListAdapter adapter = new ReminderListAdapter(this, mRemindersList, getLayoutInflater(), this);
+        ListView listView = (ListView) findViewById(R.id.remainder_list);
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                detailReminder(mRemindersList.get(position));
+            }
+        });
+    }
+
+    private void createReminder() {
+        Intent intent = new Intent(this, DetailCreate.class);
+        startActivityForResult(intent, DETAIL_CREATION_REQUEST_CODE);
+    }
+
+    private void detailReminder(Reminder reminder) {
+        Intent intent = new Intent(this, DetailCreate.class);
+        reminder.setRemainderAsExtra(intent);
+        startActivityForResult(intent, DETAIL_CREATION_REQUEST_CODE);
+    }
+
+    //Callback executed when DetailCreate is closed
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == DETAIL_CREATION_REQUEST_CODE && resultCode == RESULT_OK) {
+            Reminder reminder = Reminder.getRemainderFromExtra(data);
+            if (data.getBooleanExtra(DetailCreate.IS_SAVE, true)) {
+                addOrUpdateReminder(reminder);
+            } else {
+                deleteReminder(reminder);
+            }
+            saveRemindersList();
+        }
+    }
+
+    private void addOrUpdateReminder(Reminder reminder) {
+        if (reminder.uID > -1) {
+            for (Reminder item : mRemindersList) {
+                if (item.uID == reminder.uID) {
+                    mRemindersList.set(mRemindersList.indexOf(item), reminder);
+                    break;
+                }
+            }
+        } else {
+            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+            int currentReminderId = sharedPref.getInt(CURRENT_REMINDER_ID, 0);
+            reminder.uID = currentReminderId;
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt(CURRENT_REMINDER_ID, currentReminderId + 1);
+            editor.commit();
+            mRemindersList.add(reminder);
+        }
+        updateRemindersListView();
+    }
+
+    public void deleteReminder(Reminder reminder) {
+        for (Reminder item : mRemindersList) {
+            if (item.uID == reminder.uID) {
+                mRemindersList.remove(mRemindersList.indexOf(item));
+                break;
+            }
+        }
+        updateRemindersListView();
+    }
+
+    private void saveRemindersList() {
+        Gson gson = new Gson();
+        String jsonRemindersList = gson.toJson(mRemindersList);
+
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(SAVED_REMINDERS, jsonRemindersList);
+        editor.commit();
     }
 
     @Override
@@ -221,6 +199,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         //TODO: Remove Toast when done
         Toast.makeText(this, "Location: " + location.toString(), Toast.LENGTH_SHORT).show();
         //TODO: Add Ordering Logic of the Reminders here (by distance to current location)
+        updateRemindersListView();
+        saveRemindersList();
     }
 
     //TODO: Remove the Toasts from this Methods when done
@@ -228,7 +208,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onProviderDisabled(String provider) {
         Toast.makeText(this, provider + ": Provider Disabled", Toast.LENGTH_SHORT).show();
     }
-
 
     @Override
     public void onProviderEnabled(String provider) {
@@ -238,81 +217,5 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         Toast.makeText(this, provider + ": Provider Status Change", Toast.LENGTH_SHORT).show();
-    }
-}
-
-
-
-class LocationTracker {
-
-    private final Context mContext;
-    private final LocationListener mLocationListener;
-
-    private LocationManager locationManager;
-
-    public LocationTracker(Context context, LocationListener locationListener) {
-        mContext = context;
-        mLocationListener = locationListener;
-    }
-
-
-    public void requestLocation() throws SecurityException {
-        locationManager = (LocationManager) mContext
-                .getSystemService(Context.LOCATION_SERVICE);
-
-        //GPS status
-        boolean isGPSEnabled = locationManager
-                .isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-        //Network status
-        boolean isNetworkEnabled = locationManager
-                .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        if (!isGPSEnabled && !isNetworkEnabled) {
-            showLocationDisableAlertDialog();
-        } else {
-            if (isGPSEnabled) {
-                locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, mLocationListener, null);
-            } else {
-                locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, mLocationListener, null);
-            }
-        }
-    }
-
-    public void stopRequest() {
-        try {
-            locationManager.removeUpdates(mLocationListener);
-        } catch (SecurityException sE) {
-            sE.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void showLocationDisableAlertDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
-
-        alertDialog.setTitle(R.string.notEnabledLocationTitle);
-
-        alertDialog
-                .setMessage(R.string.notEnabledLocationMessage);
-
-        alertDialog.setPositiveButton("Settings",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(
-                                Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        mContext.startActivity(intent);
-                    }
-                });
-
-        alertDialog.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-        alertDialog.show();
     }
 }

@@ -54,6 +54,13 @@ public class Reminder {
         return result;
     }
 
+    public void setPlace(String placeName, String placeAddress, double lat, double lng){
+        this.placeName = placeName;
+        this.placeAddress = placeAddress;
+        this.lat = lat;
+        this.lng = lng;
+    }
+
     public void setRemainderAsExtra(Intent intent) {
         intent.putExtra("UID", uID);
         intent.putExtra("Title", title);

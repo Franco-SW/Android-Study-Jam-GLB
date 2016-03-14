@@ -31,14 +31,16 @@
 
     </LinearLayout>
 
-
     <ListView
         android:id="@+id/remainder_list"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/header"
-        android:layout_margin="@dimen/activity_margin" />
+        android:layout_marginLeft="@dimen/activity_margin"
+        android:layout_marginBottom="@dimen/activity_margin"
+        android:layout_marginRight="@dimen/activity_margin"
+        android:dividerHeight="@dimen/inner_separation_half"
+        android:layout_below="@id/header" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_fab"
@@ -53,4 +55,5 @@
         android:src="@drawable/ic_add_black_24dp"
         app:borderWidth="0dp"
         app:fabSize="normal" />
+
 </RelativeLayout>

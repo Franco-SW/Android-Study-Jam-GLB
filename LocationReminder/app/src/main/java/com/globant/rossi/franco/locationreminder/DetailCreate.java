@@ -1,29 +1,13 @@
 package com.globant.rossi.franco.locationreminder;
 
-import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -35,10 +19,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 public class DetailCreate extends AppCompatActivity {
-    private Reminder reminder = null;
-    private EditText locationET;
-    private static final int PLACE_PICKER_REQUEST = 1;
+    public static final String IS_SAVE = "IS_SAVE";
+    private static final int PLACE_PICKER_REQUEST_CODE = 1;
 
+    private EditText descriptionEditText;
+    private EditText locationEditText;
+    private EditText titleEditText;
+    private Reminder reminder;
+
+    //TODO: Add Permission Requests for Place Picker (INTERNET, FINE_LOCATION, READ_GSERVICES)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,79 +37,81 @@ public class DetailCreate extends AppCompatActivity {
         Intent creatorIntent = getIntent();
 
         //Find all the Elements needed
-        locationET = (EditText) findViewById(R.id.location);
-        Button save = (Button) findViewById(R.id.save);
-        Button delete = (Button) findViewById(R.id.delete);
+        descriptionEditText = (EditText) findViewById(R.id.reminder_description);
+        locationEditText = (EditText) findViewById(R.id.reminder_location);
+        titleEditText = (EditText) findViewById(R.id.reminder_title);
+        Button saveButton = (Button) findViewById(R.id.save);
+        Button deleteButton = (Button) findViewById(R.id.delete);
 
         reminder = Reminder.getRemainderFromExtra(creatorIntent);
-
         if (reminder.isValid()) {
-            ((EditText) findViewById(R.id.reminder_title)).setText(reminder.title);
-            ((EditText) findViewById(R.id.reminder_description)).setText(reminder.description);
-            locationET.setText(reminder.getPlaceIdentifier());
-            //// TODO: Add all the changes to the layout and Views from being in Detail and Being in Add
+            titleEditText.setText(reminder.title);
+            descriptionEditText.setText(reminder.description);
+            locationEditText.setText(reminder.getPlaceIdentifier());
         } else {
-            delete.setVisibility(View.GONE);
-            RelativeLayout.LayoutParams buttonLayoutParams = (RelativeLayout.LayoutParams) save.getLayoutParams();
+            deleteButton.setVisibility(View.GONE);
+            RelativeLayout.LayoutParams buttonLayoutParams = (RelativeLayout.LayoutParams) saveButton.getLayoutParams();
             buttonLayoutParams.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            save.setLayoutParams(buttonLayoutParams);
+            saveButton.setLayoutParams(buttonLayoutParams);
         }
 
         //Listeners
-        locationET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                locationFocused(v, hasFocus);
+            public void onClick(View v) {
+                delete();
             }
         });
-        locationET.setOnClickListener(new View.OnClickListener() {
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                save();
+            }
+        });
+        locationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                locationFocused(hasFocus);
+            }
+        });
+        locationEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showPlacePicker();
-                //getLocation(v);
-            }
-        });
-
-        Button saveButton = (Button) findViewById(R.id.save);
-        saveButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v)
-            {
-                updateReminder();
-                getIntent().putExtra("IS_SAVE", true);
-                reminder.setRemainderAsExtra(getIntent());
-                setResult(RESULT_OK, getIntent());
-                finish();
-            }
-        });
-
-        Button deleteButton = (Button) findViewById(R.id.delete);
-        deleteButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v)
-            {
-                updateReminder();
-                getIntent().putExtra("IS_SAVE", false);
-                reminder.setRemainderAsExtra(getIntent());
-                setResult(RESULT_OK, getIntent());
-                finish();
             }
         });
     }
 
-    private void updateReminder()
-    {
-        EditText titleEditText = (EditText) findViewById(R.id.reminder_title);
+    private void delete(){
+        getIntent().putExtra(IS_SAVE, false);
+        closeActivity();
+    }
+
+    private void save(){
+        if(validateFieldsAndShowErrors()) {
+            updateReminder();
+            getIntent().putExtra(IS_SAVE, true);
+            reminder.setRemainderAsExtra(getIntent());
+            closeActivity();
+        }
+    }
+
+    private boolean validateFieldsAndShowErrors(){
+        //TODO: Add all validations
+        return true;
+    }
+
+    private void updateReminder() {
         reminder.title = titleEditText.getText().toString();
-
-        EditText descriptionEditText = (EditText) findViewById(R.id.reminder_description);
         reminder.description = descriptionEditText.getText().toString();
-
-        //TODO UPDATE LOCATION ON REMINDER?
     }
 
-    //Functions for Event Listeners
-    private void locationFocused(View v, boolean hasFocus) {
+    private void closeActivity(){
+        setResult(RESULT_OK, getIntent());
+        finish();
+    }
+
+    private void locationFocused(boolean hasFocus) {
         if (hasFocus) {
             showPlacePicker();
         }
@@ -135,10 +126,10 @@ public class DetailCreate extends AppCompatActivity {
                 placeIntentBuilder.setLatLngBounds(startView);
             }
             Intent placeIntent = placeIntentBuilder.build(this);
-            startActivityForResult(placeIntent, PLACE_PICKER_REQUEST);
-
+            startActivityForResult(placeIntent, PLACE_PICKER_REQUEST_CODE);
         } catch (GooglePlayServicesRepairableException
                 | GooglePlayServicesNotAvailableException e) {
+            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
     }
@@ -146,22 +137,14 @@ public class DetailCreate extends AppCompatActivity {
     //Callback executed when the Place Picker is closed
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == PLACE_PICKER_REQUEST && resultCode == Activity.RESULT_OK) {
-
+        if (requestCode == PLACE_PICKER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             final Place place = PlacePicker.getPlace(data, this);
             final CharSequence name = place.getName();
             final CharSequence address = place.getAddress();
             final LatLng latLng = place.getLatLng();
-
-            reminder.placeName = name.toString();
-            reminder.placeAddress = address.toString();
-            reminder.lat = latLng.latitude;
-            reminder.lng = latLng.longitude;
-
-            locationET.setText(reminder.getPlaceIdentifier());
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
+            reminder.setPlace(name.toString(), address.toString(),
+                    latLng.latitude, latLng.longitude);
+            locationEditText.setText(reminder.getPlaceIdentifier());
         }
     }
 }
