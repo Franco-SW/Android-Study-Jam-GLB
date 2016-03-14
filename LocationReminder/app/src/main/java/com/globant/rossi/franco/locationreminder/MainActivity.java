@@ -172,10 +172,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         int reminderIndex = mRemindersList.indexOf(reminder);
         if(reminderIndex >= 0){
             mRemindersList.remove(reminderIndex);
+            saveRemindersList();
             updateRemindersListView();
         }
-        saveRemindersList();
-        updateRemindersListView();
     }
 
     private void sortRemainderList(){

@@ -31,17 +31,18 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
         {
             itemView = layoutInflater.inflate(R.layout.reminder_list_item, parent, false);
         }
-        final Reminder reminder = getItem(position);
+
+        Reminder reminder = getItem(position);
 
         TextView titleTextView = (TextView)itemView.findViewById(R.id.list_item_title);
         titleTextView.setText(reminder.title);
 
         Button deleteButton = (Button)itemView.findViewById(R.id.list_item_delete_button);
-        deleteButton.setTag(reminder.uID);
+        deleteButton.setTag(reminder);
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mainActivity.deleteReminder(reminder);
+                mainActivity.deleteReminder((Reminder) v.getTag());
             }
         });
 
