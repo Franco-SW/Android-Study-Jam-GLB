@@ -84,18 +84,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     public void addReminder(View v) {
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        int currentReminderId = sharedPref.getInt(CURRENT_REMINDER_ID, 0);
-
         Intent intent = new Intent(this, DetailCreate.class);
-        Reminder rem = new Reminder();
-        rem.uID = currentReminderId;
-        rem.setRemainderAsExtra(intent);
-
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(CURRENT_REMINDER_ID, currentReminderId + 1);
-        editor.commit();
-
         startActivityForResult(intent, DETAIL_CREATION);
     }
 
@@ -114,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Reminder reminder = Reminder.getRemainderFromExtra(data);
             if(data.getBooleanExtra("IS_SAVE", true))
             {
-                addReminder(reminder);
+                addOrEditReminder(reminder);
             }
             else
             {
@@ -126,23 +115,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    public void addReminder(Reminder reminder)
+    public void addOrEditReminder(Reminder reminder)
     {
-        int indexToRemove = -1;
-        for(Reminder item : mReminders)
-        {
-            if(item.uID == reminder.uID)
-            {
-                indexToRemove = mReminders.indexOf(item);
+        if(reminder.uID > -1) {
+            for (Reminder item : mReminders) {
+                if (item.uID == reminder.uID) {
+                    mReminders.set(mReminders.indexOf(item), reminder);
+                    break;
+                }
             }
         }
-
-        if(indexToRemove > -1)
+        else
         {
-            mReminders.remove(indexToRemove);
+            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+            int currentReminderId = sharedPref.getInt(CURRENT_REMINDER_ID, 0);
+            reminder.uID = currentReminderId;
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt(CURRENT_REMINDER_ID, currentReminderId + 1);
+            editor.commit();
+            mReminders.add(reminder);
         }
-
-        mReminders.add(reminder);
     }
 
     public void deleteReminder(Reminder reminder)
