@@ -70,8 +70,14 @@ public class Reminder {
     }
 
     public double distanceToLocationSquared(Location location){
-        return Math.pow(location.getLatitude() - lat, 2) +
-                Math.pow(location.getLongitude() - lng, 2);
+        double result;
+        if (location != null){
+            result = Math.pow(location.getLatitude() - lat, 2) +
+                    Math.pow(location.getLongitude() - lng, 2);
+        } else {
+            result = lat*lat + lng*lng;
+        }
+        return result;
     }
 
     public void setRemainderAsExtra(Intent intent) {

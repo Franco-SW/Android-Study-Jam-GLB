@@ -3,17 +3,20 @@ package com.globant.rossi.franco.locationreminder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 
+import java.util.List;
+
 /**
  * Created by Franco on 13/03/2016.
  */
 public class LocationTracker {
-    private final Context mContext;
-    private final LocationListener mLocationListener;
+    private Context mContext;
+    private LocationListener mLocationListener;
     private LocationManager mLocationManager;
 
     public LocationTracker(Context context, LocationListener locationListener) {
@@ -21,7 +24,7 @@ public class LocationTracker {
         mLocationListener = locationListener;
     }
 
-    public void requestLocation() throws SecurityException {
+    public Location requestLocation() throws SecurityException {
         mLocationManager = (LocationManager) mContext
                 .getSystemService(Context.LOCATION_SERVICE);
 
@@ -36,12 +39,30 @@ public class LocationTracker {
         if (!isGPSEnabled && !isNetworkEnabled) {
             showLocationDisableAlertDialog();
         } else {
-            if (isGPSEnabled) {
-                mLocationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, mLocationListener, null);
-            } else {
-                mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, mLocationListener, null);
+            List<String> providers = mLocationManager.getProviders(true);
+            Location lastLocation = null;
+            for (String provider:providers){
+                Location providerLocation = mLocationManager.getLastKnownLocation(provider);
+                if(lastLocation==null || isBetterThan(providerLocation, lastLocation)){
+                   lastLocation = providerLocation;
+                }
+                mLocationManager.requestSingleUpdate(provider, mLocationListener, null);
             }
+            return lastLocation;
         }
+        return null;
+    }
+
+    private boolean isBetterThan(Location locationLH, Location locationRH){
+        boolean response = locationLH != null && locationRH !=null;
+        if(response) {
+            boolean isMoreRecent = locationLH.getTime() - locationRH.getTime() > MainActivity.MINIMUM_MINUTES;
+            boolean isMoreAccurate = locationLH.hasAccuracy() && locationRH.hasAccuracy() &&
+                    locationLH.getAccuracy() < locationRH.getAccuracy();
+            boolean hasAccuracy = locationLH.hasAccuracy() && !locationRH.hasAccuracy();
+            response = isMoreRecent || isMoreAccurate || hasAccuracy;
+        }
+        return response;
     }
 
     public void showLocationDisableAlertDialog() {

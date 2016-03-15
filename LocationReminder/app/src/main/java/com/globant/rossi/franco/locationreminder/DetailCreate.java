@@ -51,7 +51,7 @@ public class DetailCreate extends AppCompatActivity {
         } else {
             deleteButton.setVisibility(View.GONE);
             RelativeLayout.LayoutParams buttonLayoutParams = (RelativeLayout.LayoutParams) saveButton.getLayoutParams();
-            buttonLayoutParams.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            buttonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
             saveButton.setLayoutParams(buttonLayoutParams);
         }
 
@@ -138,10 +138,10 @@ public class DetailCreate extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_PICKER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            final Place place = PlacePicker.getPlace(data, this);
-            final CharSequence name = place.getName();
-            final CharSequence address = place.getAddress();
-            final LatLng latLng = place.getLatLng();
+            Place place = PlacePicker.getPlace(data, this);
+            CharSequence name = place.getName();
+            CharSequence address = place.getAddress();
+            LatLng latLng = place.getLatLng();
             reminder.setPlace(name.toString(), address.toString(),
                     latLng.latitude, latLng.longitude);
             locationEditText.setText(reminder.getPlaceIdentifier());

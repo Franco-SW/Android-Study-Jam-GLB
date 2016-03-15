@@ -10,7 +10,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -29,6 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LocationListener{
+    public static final int MINIMUM_MINUTES = 15*6*1000; //1.5Min
     private static final int DETAIL_CREATION_REQUEST_CODE = 2;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 0;
     private static final String CURRENT_REMINDER_ID = "CURRENT_REMINDER_ID";
@@ -37,7 +37,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private Location lastLocation;
     private LocationTracker locationTracker;
     private List<Reminder> mRemindersList;
-    private GestureDetectorCompat mDetector;
+
+    private final android.os.Handler handler = new android.os.Handler();
+    private final Runnable stopRequest = new Runnable() {
+        public void run() {
+            locationTracker.stopRequest();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,13 +89,31 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
     private void getLocation() {
         try {
-            locationTracker.requestLocation();
+            Location location = locationTracker.requestLocation();
+
+            if(isBetterThanLastLocation(location)){
+                lastLocation = location;
+            }
+            handler.removeCallbacks(stopRequest);
+            handler.postDelayed(stopRequest, MINIMUM_MINUTES * 2);
         } catch (SecurityException sE) {
             boolean accessToFineLocation = (ActivityCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
             Toast.makeText(this, R.string.noPermisionLocationError, Toast.LENGTH_SHORT).show();
             hasPermission(accessToFineLocation);
         }
+    }
+
+    private boolean isBetterThanLastLocation(Location location){
+        boolean response = location != null && lastLocation !=null;
+        if(response) {
+            boolean isMoreRecent = location.getTime() - lastLocation.getTime() > MINIMUM_MINUTES;
+            boolean isMoreAccurate = location.hasAccuracy() && lastLocation.hasAccuracy() &&
+                    location.getAccuracy() < lastLocation.getAccuracy();
+            boolean hasAccuracy = location.hasAccuracy() && !lastLocation.hasAccuracy();
+            response = isMoreRecent || isMoreAccurate || hasAccuracy;
+        }
+        return (lastLocation == null || response);
     }
 
     @TargetApi(23)
@@ -105,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (permissions.length > 0) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    locationTracker.requestLocation();
+                    getLocation();
                 }
             }
         }
@@ -216,13 +240,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     //This callback is executed when the GPS returns the location
     @Override
     public void onLocationChanged(Location location) {
-        //TODO: Remove Toast when done
-//        Toast.makeText(this, "Location: " + location.toString(), Toast.LENGTH_SHORT).show();
-        //TODO: Add Ordering Logic of the Reminders here (by distance to current location)
-        lastLocation = location;
-        sortRemainderList();
-        updateRemindersListView();
-        saveRemindersList();
+        if(isBetterThanLastLocation(location)){
+            lastLocation = location;
+            sortRemainderList();
+            updateRemindersListView();
+            saveRemindersList();
+        }
     }
 
     //TODO: Remove the Toasts from this Methods when done
