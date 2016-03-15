@@ -1,7 +1,6 @@
 package com.globant.rossi.franco.locationreminder;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,26 +28,23 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
         this.mainActivity = mainActivity;
     }
 
-    public void setListView(ListView value)
-    {
+    public void setListView(ListView value) {
         listView = value;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
+    public View getView(int position, View convertView, ViewGroup parent) {
         View itemView = convertView;
-        if(itemView == null)
-        {
+        if (itemView == null) {
             itemView = layoutInflater.inflate(R.layout.reminder_list_item, parent, false);
         }
 
         Reminder reminder = getItem(position);
 
-        TextView titleTextView = (TextView)itemView.findViewById(R.id.list_item_title);
+        TextView titleTextView = (TextView) itemView.findViewById(R.id.list_item_title);
         titleTextView.setText(reminder.title);
 
-        Button deleteButton = (Button)itemView.findViewById(R.id.list_item_delete_button);
+        Button deleteButton = (Button) itemView.findViewById(R.id.list_item_delete_button);
         deleteButton.setTag(reminder);
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,7 +55,8 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
 
         ListItemViewHolder holder = new ListItemViewHolder();
         holder.mainView = (LinearLayout) itemView.findViewById(R.id.list_item_main_view);
-        holder.deleteView = (RelativeLayout) itemView.findViewById(R.id.list_item_delete_view);;
+        holder.deleteView = (RelativeLayout) itemView.findViewById(R.id.list_item_delete_view);
+        ;
         itemView.setOnTouchListener(new SwipeDetector(holder, position));
 
         return itemView;
@@ -98,8 +95,6 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
                     upX = event.getX();
                     float deltaX = downX - upX;
 
-                    Log.i("DELTA X: ", Float.toString(upX - downX));
-
                     if (Math.abs(deltaX) > MIN_LOCK_DISTANCE && listView != null && !motionInterceptDisallowed) {
                         listView.requestDisallowInterceptTouchEvent(true);
                         motionInterceptDisallowed = true;
@@ -123,8 +118,7 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
                         // left
                         swipeRemove();
                     } else {
-                        if(Math.abs(deltaX) < 5)
-                        {
+                        if (Math.abs(deltaX) < 5) {
                             listView.performItemClick(v, position, listView.getAdapter().getItemId(position));
                         }
                         swipe(0);
@@ -147,7 +141,7 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
         }
 
         private void swipe(int distance) {
-            if(distance > 0) return;
+            if (distance > 0) return;
             View animationView = holder.mainView;
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) animationView.getLayoutParams();
             params.rightMargin = -distance;
