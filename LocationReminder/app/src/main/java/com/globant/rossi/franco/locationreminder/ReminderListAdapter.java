@@ -74,7 +74,7 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
 
     public class SwipeDetector implements View.OnTouchListener {
 
-        private static final int MIN_DISTANCE = 300;
+        private static final int MIN_DISTANCE = -300;
         private static final int MIN_LOCK_DISTANCE = 30; // disallow motion intercept
         private boolean motionInterceptDisallowed = false;
         private float downX, upX;
@@ -98,6 +98,8 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
                     upX = event.getX();
                     float deltaX = downX - upX;
 
+                    Log.i("DELTA X: ", Float.toString(upX - downX));
+
                     if (Math.abs(deltaX) > MIN_LOCK_DISTANCE && listView != null && !motionInterceptDisallowed) {
                         listView.requestDisallowInterceptTouchEvent(true);
                         motionInterceptDisallowed = true;
@@ -117,11 +119,14 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
                 case MotionEvent.ACTION_UP:
                     upX = event.getX();
                     float deltaX = upX - downX;
-                    if (Math.abs(deltaX) > MIN_DISTANCE) {
-                        Log.i("DELTAX: ", "MIN DISTANCE");
-                        // left or right
+                    if (deltaX < MIN_DISTANCE) {
+                        // left
                         swipeRemove();
                     } else {
+                        if(Math.abs(deltaX) < 5)
+                        {
+                            listView.performItemClick(v, position, listView.getAdapter().getItemId(position));
+                        }
                         swipe(0);
                     }
 
@@ -142,6 +147,7 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
         }
 
         private void swipe(int distance) {
+            if(distance > 0) return;
             View animationView = holder.mainView;
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) animationView.getLayoutParams();
             params.rightMargin = -distance;
