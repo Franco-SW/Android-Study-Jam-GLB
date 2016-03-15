@@ -123,8 +123,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private void updateRemindersListView() {
         ReminderListAdapter adapter = new ReminderListAdapter(this, mRemindersList, getLayoutInflater(), this);
         ListView listView = (ListView) findViewById(R.id.remainder_list);
+        adapter.setListView(listView);
         listView.setAdapter(adapter);
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {

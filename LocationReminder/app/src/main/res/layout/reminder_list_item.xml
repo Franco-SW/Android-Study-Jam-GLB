@@ -1,29 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:minHeight="@dimen/button_min_size"
-    android:orientation="horizontal">
+    android:layout_height="60dp"
+    android:background="#ffebeff1"
+    android:minHeight="@dimen/button_min_size">
 
-    <TextView
-        android:id="@+id/list_item_title"
-        android:layout_width="0dp"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:maxLines="2"
-        android:text="SomeText"
-        android:textSize="16sp" />
+        android:layout_centerVertical="true"
+        android:padding="8dp"
+        android:id="@+id/list_item_delete_view">
+        <Button
+            android:id="@+id/list_item_delete_button"
+            style="@style/deleteButtonRed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:text="@string/reminder_delete"
+            android:textAllCaps="true" />
+    </RelativeLayout>
 
-    <Button
-        android:id="@+id/list_item_delete_button"
-        style="@style/deleteButtonRed"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:text="@string/reminder_delete"
-        android:textAllCaps="true" />
+        android:background="#ffebeff1"
+        android:id="@+id/list_item_main_view"
+        android:layout_centerVertical="true"
+        android:orientation="horizontal">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/list_item_title"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:maxLines="2"
+            android:text="SomeText"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</RelativeLayout>
