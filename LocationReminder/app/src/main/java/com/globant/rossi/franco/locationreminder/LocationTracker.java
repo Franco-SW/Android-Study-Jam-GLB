@@ -15,9 +15,19 @@ import java.util.List;
  * Created by Franco on 13/03/2016.
  */
 public class LocationTracker {
+    public static final int MINIMUM_MINUTES_DIFFERENCE = 15*6*1000; //1.5Min
+    public static final int MINIMUM_METERS_DIFFERENCE = 5; //5m
+
     private Context mContext;
     private LocationListener mLocationListener;
     private LocationManager mLocationManager;
+
+    private final android.os.Handler handler = new android.os.Handler();
+    private final Runnable stopRequest = new Runnable() {
+        public void run() {
+            stopRequest();
+        }
+    };
 
     public LocationTracker(Context context, LocationListener locationListener) {
         mContext = context;
@@ -28,10 +38,11 @@ public class LocationTracker {
         mLocationManager = (LocationManager) mContext
                 .getSystemService(Context.LOCATION_SERVICE);
 
+        Location bestLocation = null;
+
         //GPS status
         boolean isGPSEnabled = mLocationManager
                 .isProviderEnabled(LocationManager.GPS_PROVIDER);
-
         //Network status
         boolean isNetworkEnabled = mLocationManager
                 .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -39,27 +50,27 @@ public class LocationTracker {
         if (!isGPSEnabled && !isNetworkEnabled) {
             showLocationDisableAlertDialog();
         } else {
-            List<String> providers = mLocationManager.getProviders(true);
-            Location lastLocation = null;
-            for (String provider:providers){
+            List<String> locationProviders = mLocationManager.getProviders(true);
+            for (String provider:locationProviders){
                 Location providerLocation = mLocationManager.getLastKnownLocation(provider);
-                if(lastLocation==null || isBetterThan(providerLocation, lastLocation)){
-                   lastLocation = providerLocation;
+                if(bestLocation == null || isBetterThan(providerLocation, bestLocation)){
+                   bestLocation = providerLocation;
                 }
                 mLocationManager.requestSingleUpdate(provider, mLocationListener, null);
             }
-            return lastLocation;
         }
-        return null;
+        handler.removeCallbacks(stopRequest);
+        handler.postDelayed(stopRequest, MINIMUM_MINUTES_DIFFERENCE * 2);
+        return bestLocation;
     }
 
-    private boolean isBetterThan(Location locationLH, Location locationRH){
-        boolean response = locationLH != null && locationRH !=null;
+    public static boolean isBetterThan(Location newLocation, Location previousLocation){
+        boolean response = newLocation != null && previousLocation != null;
         if(response) {
-            boolean isMoreRecent = locationLH.getTime() - locationRH.getTime() > MainActivity.MINIMUM_MINUTES;
-            boolean isMoreAccurate = locationLH.hasAccuracy() && locationRH.hasAccuracy() &&
-                    locationLH.getAccuracy() < locationRH.getAccuracy();
-            boolean hasAccuracy = locationLH.hasAccuracy() && !locationRH.hasAccuracy();
+            boolean isMoreRecent = newLocation.getTime() - previousLocation.getTime() > MINIMUM_MINUTES_DIFFERENCE;
+            boolean isMoreAccurate = newLocation.hasAccuracy() && previousLocation.hasAccuracy() &&
+                    previousLocation.getAccuracy() - newLocation.getAccuracy() > MINIMUM_METERS_DIFFERENCE;
+            boolean hasAccuracy = newLocation.hasAccuracy() && !previousLocation.hasAccuracy();
             response = isMoreRecent || isMoreAccurate || hasAccuracy;
         }
         return response;
