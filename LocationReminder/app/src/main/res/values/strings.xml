@@ -7,7 +7,12 @@
     <string name="reminder_save">Save</string>
     <string name="reminder_delete">Delete</string>
     <string name="location_hint">Select a Location</string>
-    <string name="noPermisionLocationError" >NO PERMISSION TO USE LOCATION</string>
-    <string name="notEnabledLocationTitle" >LOCATION SETTINGS</string>
-    <string name="notEnabledLocationMessage" >Location is not enabled. Do you want to go to the settings menu?</string>
+    <string name="not_enabled_location_title">LOCATION SETTINGS</string>
+    <string name="not_enabled_location_message">Location is not enabled. Do you want to go to the settings menu?</string>
+    <string name="no_permission_location_error">NO PERMISSION TO USE LOCATION</string>
+    <string name="no_permission_error">NO PERMISSION TO USE </string>
+    <string name="no_permission_error_and"> AND </string>
+    <string name="ACCESS_FINE_LOCATION">LOCATION</string>
+    <string name="READ_GSERVICES">GOOGLE SERVICES</string>
+    <string name="INTERNET">INTERNET</string>
 </resources>

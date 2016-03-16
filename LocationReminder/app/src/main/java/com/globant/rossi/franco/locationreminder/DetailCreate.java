@@ -1,5 +1,6 @@
 package com.globant.rossi.franco.locationreminder;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -18,9 +19,12 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
+import java.security.Provider;
+
 public class DetailCreate extends AppCompatActivity {
     public static final String IS_SAVE = "IS_SAVE";
     private static final int PLACE_PICKER_REQUEST_CODE = 1;
+    private static final int PERMISSION_REQUEST_CODE = 3;
 
     private EditText descriptionEditText;
     private EditText locationEditText;
@@ -118,6 +122,11 @@ public class DetailCreate extends AppCompatActivity {
     }
 
     public void showPlacePicker() {
+        String[] permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE};
+
+        PermissionManager.CheckAndRequestPermissions(this, permissions, PERMISSION_REQUEST_CODE);
+
         try {
             PlacePicker.IntentBuilder placeIntentBuilder = new PlacePicker.IntentBuilder();
             if (reminder.isValid()) {

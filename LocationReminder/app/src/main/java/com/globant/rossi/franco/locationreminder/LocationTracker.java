@@ -79,10 +79,10 @@ public class LocationTracker {
     public void showLocationDisableAlertDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 
-        alertDialog.setTitle(R.string.notEnabledLocationTitle);
+        alertDialog.setTitle(R.string.not_enabled_location_title);
 
         alertDialog
-                .setMessage(R.string.notEnabledLocationMessage);
+                .setMessage(R.string.not_enabled_location_message);
 
         alertDialog.setPositiveButton("Settings",
                 new DialogInterface.OnClickListener() {
