@@ -31,7 +31,6 @@ public class DetailCreate extends AppCompatActivity {
     private EditText titleEditText;
     private Reminder reminder;
 
-    //TODO: Add Permission Requests for Place Picker (INTERNET, FINE_LOCATION, READ_GSERVICES)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,21 +124,24 @@ public class DetailCreate extends AppCompatActivity {
         String[] permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE};
 
-        PermissionManager.CheckAndRequestPermissions(this, permissions, PERMISSION_REQUEST_CODE);
+        boolean allPermissionsGranted = PermissionManager.CheckAndRequestPermissions(this,
+                permissions, PERMISSION_REQUEST_CODE);
 
-        try {
-            PlacePicker.IntentBuilder placeIntentBuilder = new PlacePicker.IntentBuilder();
-            if (reminder.isValid()) {
-                LatLng startPoint = new LatLng(reminder.lat, reminder.lng);
-                LatLngBounds startView = LatLngBounds.builder().include(startPoint).build();
-                placeIntentBuilder.setLatLngBounds(startView);
+        if(allPermissionsGranted) {
+            try {
+                PlacePicker.IntentBuilder placeIntentBuilder = new PlacePicker.IntentBuilder();
+                if (reminder.isValid()) {
+                    LatLng startPoint = new LatLng(reminder.lat, reminder.lng);
+                    LatLngBounds startView = LatLngBounds.builder().include(startPoint).build();
+                    placeIntentBuilder.setLatLngBounds(startView);
+                }
+                Intent placeIntent = placeIntentBuilder.build(this);
+                startActivityForResult(placeIntent, PLACE_PICKER_REQUEST_CODE);
+            } catch (GooglePlayServicesRepairableException
+                    | GooglePlayServicesNotAvailableException e) {
+                Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
-            Intent placeIntent = placeIntentBuilder.build(this);
-            startActivityForResult(placeIntent, PLACE_PICKER_REQUEST_CODE);
-        } catch (GooglePlayServicesRepairableException
-                | GooglePlayServicesNotAvailableException e) {
-            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
         }
     }
 
@@ -154,6 +156,14 @@ public class DetailCreate extends AppCompatActivity {
             reminder.setPlace(name.toString(), address.toString(),
                     latLng.latitude, latLng.longitude);
             locationEditText.setText(reminder.getPlaceIdentifier());
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_CODE &&
+                PermissionManager.checkPermissionsGranted(grantResults)) {
+            showPlacePicker();
         }
     }
 }

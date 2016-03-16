@@ -15,52 +15,75 @@ import java.util.List;
 
 public class PermissionManager {
 
-    public static void CheckAndRequestPermissions(Activity activity, String[] permissions, int requestCode) {
+    public static boolean checkAllPermissionsAreGranted(Context context, String[] permissions){
+        String[] permissionsToRequest = checkPermissionsNotGranted(context, permissions);
+        return (permissionsToRequest.length == 0);
+    }
+
+    public static boolean CheckAndRequestPermissions(Activity activity, String[] permissions, int requestCode) {
         Context context = activity.getApplicationContext();
-        List<String> permissionsToRequest = new ArrayList<>(Arrays.asList(permissions));
+        String[] permissionsToRequest;
+        permissionsToRequest = checkPermissionsNotGranted(context, permissions);
+        if(permissionsToRequest.length > 0) {
+            requestPermissions(activity, permissionsToRequest, requestCode);
+            return false;
+        }
+        return true;
+    }
+
+    public static String[] checkPermissionsNotGranted(Context context, String[] permissions){
+        List<String> permissionsNotGranted = new ArrayList<>();
+
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(context, permission)
+                    != PackageManager.PERMISSION_GRANTED) {
+                permissionsNotGranted.add(permission);
+            }
+        }
+        return permissionsNotGranted.toArray(new String[permissionsNotGranted.size()]);
+    }
+
+    public static void requestPermissions(Activity activity, String[] permissionsToRequest, int requestCode) {
+        Context context = activity.getApplicationContext();
         String message = context.getString(R.string.no_permission_error);
-        boolean previous = false;
 
-        for (int i = 0; i < permissionsToRequest.size(); i++) {
-            if (ContextCompat.checkSelfPermission(context, permissionsToRequest.get(i))
-                    == PackageManager.PERMISSION_GRANTED) {
-                permissionsToRequest.remove(i);
-            } else {
-                if (previous) {
-                    message = message + ", ";
-                }
-
-                switch (permissionsToRequest.get(i)) {
-                    case Manifest.permission.ACCESS_FINE_LOCATION:
-                        message = message + context.getString(R.string.no_permission_error);
-                        break;
-                }
-
-                previous = true;
+        for (String permission : permissionsToRequest) {
+            switch (permission) {
+                case Manifest.permission.ACCESS_FINE_LOCATION:
+                    message = message + context.getString(R.string.ACCESS_FINE_LOCATION);
+                    break;
+                case Manifest.permission.ACCESS_NETWORK_STATE:
+                    message = message + context.getString(R.string.INTERNET);
+                    break;
+                case Manifest.permission.INTERNET:
+                    message = message + context.getString(R.string.INTERNET);
+                    break;
             }
+            message = message + ", ";
         }
 
-        if (!permissionsToRequest.isEmpty()) {
-            int lastCommaIndex = message.lastIndexOf(", ");
-
-            if (lastCommaIndex >= 0) {
-                message = message.substring(0, lastCommaIndex) +
-                        context.getString(R.string.no_permission_error_and) +
-                        message.substring(lastCommaIndex + 2);
-            }
-
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-            askPermission(activity, permissionsToRequest, requestCode);
+        int lastCommaIndex = message.lastIndexOf(", ");
+        if (lastCommaIndex >= 0) {
+            message = message.substring(0, lastCommaIndex);
         }
+
+        lastCommaIndex = message.lastIndexOf(", ");
+        if (lastCommaIndex >= 0) {
+            message = message.substring(0, lastCommaIndex) +
+                    context.getString(R.string.no_permission_error_and) +
+                    message.substring(lastCommaIndex + 2);
+        }
+
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        makePermissionsRequest(activity, permissionsToRequest, requestCode);
     }
 
     @TargetApi(23)
-    private static void askPermission(Activity activity, List<String> permissions, int requestCode) {
-        ActivityCompat.requestPermissions(activity,
-                permissions.toArray(new String[permissions.size()]), requestCode);
+    private static void makePermissionsRequest(Activity activity, String[] permissions, int requestCode) {
+        ActivityCompat.requestPermissions(activity, permissions, requestCode);
     }
 
-    public static boolean checkGrantResults(int[] grantResults) {
+    public static boolean checkPermissionsGranted(int[] grantResults) {
         if (grantResults.length > 0) {
             for (int grantResult : grantResults) {
                 if (grantResult != PackageManager.PERMISSION_GRANTED) {

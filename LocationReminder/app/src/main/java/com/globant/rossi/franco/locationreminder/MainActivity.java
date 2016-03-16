@@ -1,15 +1,12 @@
 package com.globant.rossi.franco.locationreminder;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -89,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         } catch (SecurityException sE) {
             String[] permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
-            PermissionManager.CheckAndRequestPermissions(this, permissions, PERMISSION_REQUEST_CODE);
+            PermissionManager.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE);
         }
     }
 
@@ -101,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_CODE &&
-                PermissionManager.checkGrantResults(grantResults)) {
+                PermissionManager.checkPermissionsGranted(grantResults)) {
             getLocation();
         }
     }
