@@ -168,6 +168,7 @@ public class DetailCreate extends AppCompatActivity {
             reminder.setPlace(name.toString(), address.toString(),
                     latLng.latitude, latLng.longitude);
             locationEditText.setText(reminder.getPlaceIdentifier());
+            locationEditText.setError(null);
         }
     }
 
