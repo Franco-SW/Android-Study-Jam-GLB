@@ -50,6 +50,9 @@ public class LocationTracker {
         if (!isGPSEnabled && !isNetworkEnabled) {
             showLocationDisableAlertDialog();
         } else {
+            //Check if there are providers. If there are none it means we have no permissions.
+            if(mLocationManager.getProviders(false).isEmpty()){ throw new SecurityException(); }
+
             List<String> locationProviders = mLocationManager.getProviders(true);
             for (String provider:locationProviders){
                 Location providerLocation = mLocationManager.getLastKnownLocation(provider);

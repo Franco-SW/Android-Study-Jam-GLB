@@ -45,7 +45,7 @@ public class PermissionManager {
 
     public static void requestPermissions(Activity activity, String[] permissionsToRequest, int requestCode) {
         Context context = activity.getApplicationContext();
-        String message = context.getString(R.string.no_permission_error);
+        String message = context.getString(R.string.no_permission_error) + " ";
 
         for (String permission : permissionsToRequest) {
             switch (permission) {
@@ -53,7 +53,7 @@ public class PermissionManager {
                     message = message + context.getString(R.string.ACCESS_FINE_LOCATION);
                     break;
                 case Manifest.permission.ACCESS_NETWORK_STATE:
-                    message = message + context.getString(R.string.INTERNET);
+                    message = message + context.getString(R.string.ACCESS_NETWORK_STATE);
                     break;
                 case Manifest.permission.INTERNET:
                     message = message + context.getString(R.string.INTERNET);
