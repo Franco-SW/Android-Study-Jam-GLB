@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
-    android:background="#ffebeff1"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryLighter"
     android:minHeight="@dimen/button_min_size">
 
     <RelativeLayout
+        android:id="@+id/list_item_delete_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerVertical="true"
-        android:padding="8dp"
-        android:id="@+id/list_item_delete_view">
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true">
+
         <Button
             android:id="@+id/list_item_delete_button"
             style="@style/deleteButtonRed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:enabled="false"
             android:focusable="false"
             android:focusableInTouchMode="false"
@@ -26,31 +26,23 @@
     </RelativeLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#ffebeff1"
         android:id="@+id/list_item_main_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerVertical="true"
+        android:background="@color/colorPrimaryLighter"
+        android:minHeight="@dimen/button_min_size"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/list_item_title"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:drawableRight="@drawable/ic_chevron_right_black_24dp"
             android:gravity="center_vertical"
             android:maxLines="2"
             android:text="SomeText"
+            android:textColor="@color/colorPrimaryDark"
             android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginRight="4dp"
-            android:gravity="center_vertical"
-            android:maxLines="2"
-            android:text=">"
-            android:textSize="26sp" />
     </LinearLayout>
-
 </RelativeLayout>

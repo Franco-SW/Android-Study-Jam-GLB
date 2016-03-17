@@ -26,9 +26,9 @@ public class Reminder {
 
 
     @Override
-    public boolean equals(Object o){
-            return super.equals(o) ||
-                    (o instanceof Reminder && (((Reminder) o).uID == this.uID));
+    public boolean equals(Object o) {
+        return super.equals(o) ||
+                (o instanceof Reminder && (((Reminder) o).uID == this.uID));
     }
 
     public boolean isValid() {
@@ -62,20 +62,20 @@ public class Reminder {
         return result;
     }
 
-    public void setPlace(String placeName, String placeAddress, double lat, double lng){
+    public void setPlace(String placeName, String placeAddress, double lat, double lng) {
         this.placeName = placeName;
         this.placeAddress = placeAddress;
         this.lat = lat;
         this.lng = lng;
     }
 
-    public double distanceToLocationSquared(Location location){
+    public double distanceToLocationSquared(Location location) {
         double result;
-        if (location != null){
+        if (location != null) {
             result = Math.pow(location.getLatitude() - lat, 2) +
                     Math.pow(location.getLongitude() - lng, 2);
         } else {
-            result = lat*lat + lng*lng;
+            result = lat * lat + lng * lng;
         }
         return result;
     }

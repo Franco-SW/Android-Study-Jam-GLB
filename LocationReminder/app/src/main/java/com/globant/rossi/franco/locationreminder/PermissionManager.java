@@ -10,12 +10,11 @@ import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class PermissionManager {
 
-    public static boolean checkAllPermissionsAreGranted(Context context, String[] permissions){
+    public static boolean checkAllPermissionsAreGranted(Context context, String[] permissions) {
         String[] permissionsToRequest = checkPermissionsNotGranted(context, permissions);
         return (permissionsToRequest.length == 0);
     }
@@ -24,14 +23,14 @@ public class PermissionManager {
         Context context = activity.getApplicationContext();
         String[] permissionsToRequest;
         permissionsToRequest = checkPermissionsNotGranted(context, permissions);
-        if(permissionsToRequest.length > 0) {
+        if (permissionsToRequest.length > 0) {
             requestPermissions(activity, permissionsToRequest, requestCode);
             return false;
         }
         return true;
     }
 
-    public static String[] checkPermissionsNotGranted(Context context, String[] permissions){
+    public static String[] checkPermissionsNotGranted(Context context, String[] permissions) {
         List<String> permissionsNotGranted = new ArrayList<>();
 
         for (String permission : permissions) {

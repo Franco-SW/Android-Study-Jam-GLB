@@ -19,8 +19,6 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
-import java.security.Provider;
-
 public class DetailCreate extends AppCompatActivity {
     public static final String IS_SAVE = "IS_SAVE";
     private static final int PLACE_PICKER_REQUEST_CODE = 1;
@@ -85,13 +83,13 @@ public class DetailCreate extends AppCompatActivity {
         });
     }
 
-    private void delete(){
+    private void delete() {
         getIntent().putExtra(IS_SAVE, false);
         closeActivity();
     }
 
-    private void save(){
-        if(validateFieldsAndShowErrors()) {
+    private void save() {
+        if (validateFieldsAndShowErrors()) {
             updateReminder();
             getIntent().putExtra(IS_SAVE, true);
             reminder.setRemainderAsExtra(getIntent());
@@ -99,16 +97,16 @@ public class DetailCreate extends AppCompatActivity {
         }
     }
 
-    private boolean validateFieldsAndShowErrors(){
+    private boolean validateFieldsAndShowErrors() {
         boolean validationPassed = true;
         String title = titleEditText.getText().toString().trim();
-        if(title.isEmpty()){
+        if (title.isEmpty()) {
             titleEditText.setText("");
             titleEditText.setError(getString(R.string.field_required_error_message));
             validationPassed = false;
         }
         String locationText = locationEditText.getText().toString().trim();
-        if(locationText.isEmpty()){
+        if (locationText.isEmpty()) {
             locationEditText.setText("");
             locationEditText.setError(getString(R.string.field_required_error_message));
             validationPassed = false;
@@ -121,7 +119,7 @@ public class DetailCreate extends AppCompatActivity {
         reminder.description = descriptionEditText.getText().toString();
     }
 
-    private void closeActivity(){
+    private void closeActivity() {
         setResult(RESULT_OK, getIntent());
         finish();
     }
@@ -139,7 +137,7 @@ public class DetailCreate extends AppCompatActivity {
         boolean allPermissionsGranted = PermissionManager.CheckAndRequestPermissions(this,
                 permissions, PERMISSION_REQUEST_CODE);
 
-        if(allPermissionsGranted) {
+        if (allPermissionsGranted) {
             try {
                 PlacePicker.IntentBuilder placeIntentBuilder = new PlacePicker.IntentBuilder();
                 if (reminder.isValid()) {

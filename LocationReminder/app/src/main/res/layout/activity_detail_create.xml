@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/inner_separation"
-        android:hint="@string/reminder_title"
+        android:hint="@string/reminder_title_hint"
         android:inputType="text"
         android:lines="1" />
 
@@ -55,7 +55,7 @@
         android:inputType="none"
         android:lines="1"
         android:singleLine="true"
-        android:hint="@string/location_hint" />
+        android:hint="@string/reminder_location_hint" />
 
     <RelativeLayout
         android:layout_width="match_parent"

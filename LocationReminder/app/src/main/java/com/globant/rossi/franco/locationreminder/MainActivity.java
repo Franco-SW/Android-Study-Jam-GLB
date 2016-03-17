@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -26,7 +25,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
     private static final int DETAIL_CREATION_REQUEST_CODE = 2;
-    //    private static final int LOCATION_PERMISSION_REQUEST_CODE = 0;
     private static final int PERMISSION_REQUEST_CODE = 0;
     private static final String CURRENT_REMINDER_ID = "CURRENT_REMINDER_ID";
     private static final String SAVED_REMINDERS = "SAVED_REMINDERS";
@@ -216,19 +214,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    //TODO: Remove the Toasts from this Methods when done
     @Override
     public void onProviderDisabled(String provider) {
-        Toast.makeText(this, provider + ": Provider Disabled", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-        Toast.makeText(this, provider + ": Provider Enabled", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        Toast.makeText(this, provider + ": Provider Status Change", Toast.LENGTH_SHORT).show();
     }
 }

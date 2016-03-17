@@ -11,11 +11,8 @@ import android.support.v7.app.AlertDialog;
 
 import java.util.List;
 
-/**
- * Created by Franco on 13/03/2016.
- */
 public class LocationTracker {
-    public static final int MINIMUM_MINUTES_DIFFERENCE = 15*6*1000; //1.5Min
+    public static final int MINIMUM_MINUTES_DIFFERENCE = 15 * 6 * 1000; //1.5Min
     public static final int MINIMUM_METERS_DIFFERENCE = 5; //5m
 
     private Context mContext;
@@ -51,13 +48,15 @@ public class LocationTracker {
             showLocationDisableAlertDialog();
         } else {
             //Check if there are providers. If there are none it means we have no permissions.
-            if(mLocationManager.getProviders(false).isEmpty()){ throw new SecurityException(); }
+            if (mLocationManager.getProviders(false).isEmpty()) {
+                throw new SecurityException();
+            }
 
             List<String> locationProviders = mLocationManager.getProviders(true);
-            for (String provider:locationProviders){
+            for (String provider : locationProviders) {
                 Location providerLocation = mLocationManager.getLastKnownLocation(provider);
-                if(bestLocation == null || isBetterThan(providerLocation, bestLocation)){
-                   bestLocation = providerLocation;
+                if (bestLocation == null || isBetterThan(providerLocation, bestLocation)) {
+                    bestLocation = providerLocation;
                 }
                 mLocationManager.requestSingleUpdate(provider, mLocationListener, null);
             }
@@ -67,9 +66,9 @@ public class LocationTracker {
         return bestLocation;
     }
 
-    public static boolean isBetterThan(Location newLocation, Location previousLocation){
+    public static boolean isBetterThan(Location newLocation, Location previousLocation) {
         boolean response = newLocation != null && previousLocation != null;
-        if(response) {
+        if (response) {
             boolean isMoreRecent = newLocation.getTime() - previousLocation.getTime() > MINIMUM_MINUTES_DIFFERENCE;
             boolean isMoreAccurate = newLocation.hasAccuracy() && previousLocation.hasAccuracy() &&
                     previousLocation.getAccuracy() - newLocation.getAccuracy() > MINIMUM_METERS_DIFFERENCE;

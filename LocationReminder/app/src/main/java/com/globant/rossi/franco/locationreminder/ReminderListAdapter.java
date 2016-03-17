@@ -14,9 +14,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-/**
- * Created by Matias on 13/3/2016.
- */
 public class ReminderListAdapter extends ArrayAdapter<Reminder> {
     private MainActivity mainActivity;
     private LayoutInflater layoutInflater;
@@ -117,8 +114,7 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
                         swipeRemove();
                     } else if (deltaX < MIN_DISTANCE) {
                         swipe(MIN_DISTANCE);
-                    }
-                    else{
+                    } else {
                         holder.deleteView.setVisibility(View.GONE);
                         holder.deleteView.findViewById(R.id.list_item_delete_button).setEnabled(false);
                         swipe(0);
