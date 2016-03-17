@@ -56,7 +56,8 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
         ListItemViewHolder holder = new ListItemViewHolder();
         holder.mainView = (LinearLayout) itemView.findViewById(R.id.list_item_main_view);
         holder.deleteView = (RelativeLayout) itemView.findViewById(R.id.list_item_delete_view);
-        ;
+        holder.deleteView.setVisibility(View.GONE);
+
         itemView.setOnTouchListener(new SwipeDetector(holder, position));
 
         return itemView;
@@ -70,7 +71,7 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
     }
 
     public class SwipeDetector implements View.OnTouchListener {
-
+        private static final int MIN_DELETE_DISTANCE = -500;
         private static final int MIN_DISTANCE = -300;
         private static final int MIN_LOCK_DISTANCE = 30; // disallow motion intercept
         private boolean motionInterceptDisallowed = false;
@@ -101,10 +102,8 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
                     }
 
                     if (deltaX > 0) {
-                        //holder.deleteView.setVisibility(View.GONE);
-                    } else {
-                        // if first swiped left and then swiped right
                         holder.deleteView.setVisibility(View.VISIBLE);
+                        holder.deleteView.findViewById(R.id.list_item_delete_button).setEnabled(true);
                     }
 
                     swipe(-(int) deltaX);
@@ -114,14 +113,19 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
                 case MotionEvent.ACTION_UP:
                     upX = event.getX();
                     float deltaX = upX - downX;
-                    if (deltaX < MIN_DISTANCE) {
-                        // left
+                    if (deltaX < MIN_DELETE_DISTANCE) {
                         swipeRemove();
-                    } else {
+                    } else if (deltaX < MIN_DISTANCE) {
+                        swipe(MIN_DISTANCE);
+                    }
+                    else{
+                        holder.deleteView.setVisibility(View.GONE);
+                        holder.deleteView.findViewById(R.id.list_item_delete_button).setEnabled(false);
+                        swipe(0);
+
                         if (Math.abs(deltaX) < 5) {
                             listView.performItemClick(v, position, listView.getAdapter().getItemId(position));
                         }
-                        swipe(0);
                     }
 
                     if (listView != null) {
@@ -129,11 +133,9 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder> {
                         motionInterceptDisallowed = false;
                     }
 
-                    holder.deleteView.setVisibility(View.VISIBLE);
                     return true;
 
                 case MotionEvent.ACTION_CANCEL:
-                    holder.deleteView.setVisibility(View.VISIBLE);
                     return false;
             }
 
