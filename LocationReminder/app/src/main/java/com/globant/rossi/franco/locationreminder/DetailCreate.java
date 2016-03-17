@@ -97,7 +97,6 @@ public class DetailCreate extends AppCompatActivity {
     }
 
     private boolean validateFieldsAndShowErrors(){
-        //TODO: Add all validations
         boolean validationPassed = true;
         String title = titleEditText.getText().toString().trim();
         if(title.isEmpty()){
