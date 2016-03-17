@@ -98,7 +98,20 @@ public class DetailCreate extends AppCompatActivity {
 
     private boolean validateFieldsAndShowErrors(){
         //TODO: Add all validations
-        return true;
+        boolean validationPassed = true;
+        String title = titleEditText.getText().toString().trim();
+        if(title.isEmpty()){
+            titleEditText.setText("");
+            titleEditText.setError(getString(R.string.field_required_error_message));
+            validationPassed = false;
+        }
+        String locationText = locationEditText.getText().toString().trim();
+        if(locationText.isEmpty()){
+            locationEditText.setText("");
+            locationEditText.setError(getString(R.string.field_required_error_message));
+            validationPassed = false;
+        }
+        return validationPassed;
     }
 
     private void updateReminder() {
