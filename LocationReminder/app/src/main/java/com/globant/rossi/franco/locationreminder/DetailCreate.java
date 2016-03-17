@@ -1,5 +1,6 @@
 package com.globant.rossi.franco.locationreminder;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -18,16 +19,18 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
+import java.security.Provider;
+
 public class DetailCreate extends AppCompatActivity {
     public static final String IS_SAVE = "IS_SAVE";
     private static final int PLACE_PICKER_REQUEST_CODE = 1;
+    private static final int PERMISSION_REQUEST_CODE = 3;
 
     private EditText descriptionEditText;
     private EditText locationEditText;
     private EditText titleEditText;
     private Reminder reminder;
 
-    //TODO: Add Permission Requests for Place Picker (INTERNET, FINE_LOCATION, READ_GSERVICES)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,19 +133,27 @@ public class DetailCreate extends AppCompatActivity {
     }
 
     public void showPlacePicker() {
-        try {
-            PlacePicker.IntentBuilder placeIntentBuilder = new PlacePicker.IntentBuilder();
-            if (reminder.isValid()) {
-                LatLng startPoint = new LatLng(reminder.lat, reminder.lng);
-                LatLngBounds startView = LatLngBounds.builder().include(startPoint).build();
-                placeIntentBuilder.setLatLngBounds(startView);
+        String[] permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE};
+
+        boolean allPermissionsGranted = PermissionManager.CheckAndRequestPermissions(this,
+                permissions, PERMISSION_REQUEST_CODE);
+
+        if(allPermissionsGranted) {
+            try {
+                PlacePicker.IntentBuilder placeIntentBuilder = new PlacePicker.IntentBuilder();
+                if (reminder.isValid()) {
+                    LatLng startPoint = new LatLng(reminder.lat, reminder.lng);
+                    LatLngBounds startView = LatLngBounds.builder().include(startPoint).build();
+                    placeIntentBuilder.setLatLngBounds(startView);
+                }
+                Intent placeIntent = placeIntentBuilder.build(this);
+                startActivityForResult(placeIntent, PLACE_PICKER_REQUEST_CODE);
+            } catch (GooglePlayServicesRepairableException
+                    | GooglePlayServicesNotAvailableException e) {
+                Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
-            Intent placeIntent = placeIntentBuilder.build(this);
-            startActivityForResult(placeIntent, PLACE_PICKER_REQUEST_CODE);
-        } catch (GooglePlayServicesRepairableException
-                | GooglePlayServicesNotAvailableException e) {
-            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
         }
     }
 
@@ -157,6 +168,14 @@ public class DetailCreate extends AppCompatActivity {
             reminder.setPlace(name.toString(), address.toString(),
                     latLng.latitude, latLng.longitude);
             locationEditText.setText(reminder.getPlaceIdentifier());
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_CODE &&
+                PermissionManager.checkPermissionsGranted(grantResults)) {
+            showPlacePicker();
         }
     }
 }

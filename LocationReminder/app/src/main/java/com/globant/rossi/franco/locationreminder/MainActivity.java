@@ -1,15 +1,12 @@
 package com.globant.rossi.franco.locationreminder;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -27,9 +24,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LocationListener{
+public class MainActivity extends AppCompatActivity implements LocationListener {
     private static final int DETAIL_CREATION_REQUEST_CODE = 2;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 0;
+    //    private static final int LOCATION_PERMISSION_REQUEST_CODE = 0;
+    private static final int PERMISSION_REQUEST_CODE = 0;
     private static final String CURRENT_REMINDER_ID = "CURRENT_REMINDER_ID";
     private static final String SAVED_REMINDERS = "SAVED_REMINDERS";
 
@@ -83,40 +81,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         try {
             Location location = locationTracker.requestLocation();
 
-            if(isBetterThanLastLocation(location)){
+            if (isBetterThanLastLocation(location)) {
                 lastLocation = location;
             }
         } catch (SecurityException sE) {
-            boolean accessToFineLocation = (ActivityCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
-            if (!accessToFineLocation) {
-                Toast.makeText(this, R.string.noPermisionLocationError, Toast.LENGTH_SHORT).show();
-                askPermission();
-            } else {
-                sE.printStackTrace();
-            }
+            String[] permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+            PermissionManager.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE);
         }
     }
 
-    private boolean isBetterThanLastLocation(Location location){
+    private boolean isBetterThanLastLocation(Location location) {
         boolean response = LocationTracker.isBetterThan(location, lastLocation);
         return (lastLocation == null || response);
     }
 
-    @TargetApi(23)
-    private void askPermission() {
-            String[] permissions = new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION};
-            requestPermissions(permissions, LOCATION_PERMISSION_REQUEST_CODE);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (permissions.length > 0) {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getLocation();
-                }
-            }
+        if (requestCode == PERMISSION_REQUEST_CODE &&
+                PermissionManager.checkPermissionsGranted(grantResults)) {
+            getLocation();
         }
     }
 
@@ -160,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private void addOrUpdateReminder(Reminder reminder) {
         if (reminder.isValid()) {
             int reminderIndex = mRemindersList.indexOf(reminder);
-            if(reminderIndex >= 0){
+            if (reminderIndex >= 0) {
                 mRemindersList.set(reminderIndex, reminder);
             }
         } else {
@@ -179,22 +162,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
     public void deleteReminder(Reminder reminder) {
         int reminderIndex = mRemindersList.indexOf(reminder);
-        if(reminderIndex >= 0){
+        if (reminderIndex >= 0) {
             mRemindersList.remove(reminderIndex);
             saveRemindersList();
             updateRemindersListView();
         }
     }
 
-    private void sortRemainderList(){
-        Comparator<Reminder> comparator = new Comparator<Reminder>(){
+    private void sortRemainderList() {
+        Comparator<Reminder> comparator = new Comparator<Reminder>() {
             @Override
             public int compare(Reminder r1, Reminder r2) {
                 double result = r1.distanceToLocationSquared(lastLocation) - r2.distanceToLocationSquared(lastLocation);
 
-                if(result > 0){
+                if (result > 0) {
                     return 1;
-                }else if(result < 0){
+                } else if (result < 0) {
                     return -1;
                 } else {
                     return 0;
@@ -225,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     //This callback is executed when the GPS returns the location
     @Override
     public void onLocationChanged(Location location) {
-        if(isBetterThanLastLocation(location)){
+        if (isBetterThanLastLocation(location)) {
             lastLocation = location;
             sortRemainderList();
             updateRemindersListView();

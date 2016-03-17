@@ -50,6 +50,9 @@ public class LocationTracker {
         if (!isGPSEnabled && !isNetworkEnabled) {
             showLocationDisableAlertDialog();
         } else {
+            //Check if there are providers. If there are none it means we have no permissions.
+            if(mLocationManager.getProviders(false).isEmpty()){ throw new SecurityException(); }
+
             List<String> locationProviders = mLocationManager.getProviders(true);
             for (String provider:locationProviders){
                 Location providerLocation = mLocationManager.getLastKnownLocation(provider);
@@ -79,10 +82,10 @@ public class LocationTracker {
     public void showLocationDisableAlertDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 
-        alertDialog.setTitle(R.string.notEnabledLocationTitle);
+        alertDialog.setTitle(R.string.not_enabled_location_title);
 
         alertDialog
-                .setMessage(R.string.notEnabledLocationMessage);
+                .setMessage(R.string.not_enabled_location_message);
 
         alertDialog.setPositiveButton("Settings",
                 new DialogInterface.OnClickListener() {
