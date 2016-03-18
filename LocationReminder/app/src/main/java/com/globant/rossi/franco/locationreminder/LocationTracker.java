@@ -9,11 +9,11 @@ import android.location.LocationManager;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class LocationTracker {
     public static final int MINIMUM_MINUTES_DIFFERENCE = 15 * 6 * 1000; //1.5Min
-    public static final int MINIMUM_METERS_DIFFERENCE = 5; //5m
 
     private Context mContext;
     private LocationListener mLocationListener;
@@ -67,16 +67,53 @@ public class LocationTracker {
     }
 
     public static boolean isBetterThan(Location newLocation, Location previousLocation) {
-        boolean response = newLocation != null && previousLocation != null;
+        boolean response = newLocation != null;
         if (response) {
-            boolean isMoreRecent = newLocation.getTime() - previousLocation.getTime() > MINIMUM_MINUTES_DIFFERENCE;
-            boolean isMoreAccurate = newLocation.hasAccuracy() && previousLocation.hasAccuracy() &&
-                    previousLocation.getAccuracy() - newLocation.getAccuracy() > MINIMUM_METERS_DIFFERENCE;
-            boolean hasAccuracy = newLocation.hasAccuracy() && !previousLocation.hasAccuracy();
-            response = isMoreRecent || isMoreAccurate || hasAccuracy;
+            if (previousLocation != null) {
+                float distance = previousLocation.distanceTo(newLocation);
+
+                boolean isBetterInsideArea = distance <= previousLocation.getAccuracy() &&
+                        newLocation.hasAccuracy() &&
+                        newLocation.getAccuracy() < previousLocation.getAccuracy();
+                boolean isBetterOutsideArea = distance > previousLocation.getAccuracy() &&
+                        newLocation.hasAccuracy() && (!previousLocation.hasAccuracy() ||
+                        newLocation.getAccuracy() <= previousLocation.getAccuracy());
+                boolean isMoreRecent = newLocation.getTime() - previousLocation.getTime() > MINIMUM_MINUTES_DIFFERENCE;
+
+                response = isMoreRecent || isBetterInsideArea || isBetterOutsideArea;
+            }
         }
         return response;
     }
+
+    public static boolean isBetterThanProviderBased(Location newLocation, Location previousLocation) {
+        boolean response = false;
+        if (previousLocation != null) {
+            if (newLocation != null) {
+                if (newLocation.getTime() - previousLocation.getTime() < MINIMUM_MINUTES_DIFFERENCE) {
+                    String newLocationProvider = newLocation.getProvider();
+                    String lastLocationProvider = previousLocation.getProvider();
+
+                    if (newLocationProvider != null && newLocationProvider.equals(lastLocationProvider)) {
+                        response = LocationTracker.isBetterThan(newLocation, previousLocation);
+                    } else {
+                        List<String> providers = Arrays.asList(LocationManager.PASSIVE_PROVIDER, LocationManager.NETWORK_PROVIDER,
+                                LocationManager.GPS_PROVIDER);
+
+                        if (providers.indexOf(newLocationProvider) > providers.indexOf(lastLocationProvider)) {
+                            response = true;
+                        }
+                    }
+                } else {
+                    response = true;
+                }
+            }
+        } else {
+            response = true;
+        }
+        return (response);
+    }
+
 
     public void showLocationDisableAlertDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);

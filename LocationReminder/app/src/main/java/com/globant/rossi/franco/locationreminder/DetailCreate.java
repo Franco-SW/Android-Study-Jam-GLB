@@ -140,7 +140,7 @@ public class DetailCreate extends AppCompatActivity {
         if (allPermissionsGranted) {
             try {
                 PlacePicker.IntentBuilder placeIntentBuilder = new PlacePicker.IntentBuilder();
-                if (reminder.isValid()) {
+                if (reminder.isValid() || !locationEditText.getText().equals("")) {
                     LatLng startPoint = new LatLng(reminder.lat, reminder.lng);
                     LatLngBounds startView = LatLngBounds.builder().include(startPoint).build();
                     placeIntentBuilder.setLatLngBounds(startView);

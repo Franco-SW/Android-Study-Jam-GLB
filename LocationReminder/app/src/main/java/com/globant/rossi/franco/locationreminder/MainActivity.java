@@ -89,8 +89,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     private boolean isBetterThanLastLocation(Location location) {
-        boolean response = LocationTracker.isBetterThan(location, lastLocation);
-        return (lastLocation == null || response);
+        return LocationTracker.isBetterThanProviderBased(location, lastLocation);
     }
 
     @Override
