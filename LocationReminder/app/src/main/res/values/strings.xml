@@ -10,8 +10,8 @@
     <string name="field_required_error_message">This field is required</string>
     <string name="not_enabled_location_title">LOCATION SETTINGS</string>
     <string name="not_enabled_location_message">Location is not enabled. Do you want to go to the settings menu?</string>
-    <string name="no_permission_error">NO PERMISSION TO USE </string>
-    <string name="no_permission_error_and"> AND </string>
+    <string name="no_permission_error">NO PERMISSION TO USE</string>
+    <string name="no_permission_error_and">AND</string>
     <string name="ACCESS_FINE_LOCATION">LOCATION</string>
     <string name="ACCESS_NETWORK_STATE">NETWORK STATE</string>
     <string name="INTERNET">INTERNET</string>
