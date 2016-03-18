@@ -63,8 +63,7 @@
         android:hint="@string/reminder_location_hint"
         android:inputType="none"
         android:lines="1"
-        android:singleLine="true"
-        android:textColorHint="@color/title" />
+        android:singleLine="true" />
 
     <Button
         android:id="@+id/delete"
