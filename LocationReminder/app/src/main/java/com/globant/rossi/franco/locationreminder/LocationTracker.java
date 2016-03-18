@@ -100,7 +100,8 @@ public class LocationTracker {
                         List<String> providers = Arrays.asList(LocationManager.PASSIVE_PROVIDER, LocationManager.NETWORK_PROVIDER,
                                 LocationManager.GPS_PROVIDER);
 
-                        if (providers.indexOf(newLocationProvider) > providers.indexOf(lastLocationProvider)) {
+                        if (providers.indexOf(newLocationProvider) > providers.indexOf(lastLocationProvider) &&
+                                previousLocation.getTime() - newLocation.getTime() < MINIMUM_MINUTES_DIFFERENCE) {
                             response = true;
                         }
                     }
