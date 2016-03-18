@@ -41,8 +41,10 @@
             android:drawableRight="@drawable/ic_chevron_right_black_24dp"
             android:gravity="center_vertical"
             android:maxLines="2"
+            android:paddingLeft="@dimen/inner_separation"
+            android:paddingRight="@dimen/inner_separation"
             android:text="SomeText"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/title"
             android:textSize="16sp" />
     </LinearLayout>
 </RelativeLayout>

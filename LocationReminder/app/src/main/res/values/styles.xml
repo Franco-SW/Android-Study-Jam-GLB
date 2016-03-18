@@ -38,12 +38,12 @@
     </style>
 
     <style name="deleteButton" parent="Widget.AppCompat.Button.Borderless">
-        <item name="android:textColor">#FF0000</item>
+        <item name="android:textColor">@color/colorAccent</item>
     </style>
 
     <style name="deleteButtonRed" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">#FFF</item>
-        <item name="android:background">#FF0000</item>
+        <item name="android:background">@color/colorAccent</item>
     </style>
 
 </resources>
